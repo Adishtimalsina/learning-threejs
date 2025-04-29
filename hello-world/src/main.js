@@ -12,7 +12,8 @@ const cubeMesh = new THREE.Mesh(cube, matrial)
 
 cubeMesh.position.y =1;
 
-//
+//rotation of the wmesh
+cubeMesh.rotation.x = THREE.MathUtils.degToRad(45);
 
 // //create a parent group, which holds multiple meshes
 // const cubeMesh1 = new THREE.Mesh(cube, matrial)
@@ -61,7 +62,6 @@ renderer.setPixelRatio(maxPixelRatio);
 //inistatiate the orbit controll
 const control = new OrbitControls(camera, canvas);
 control.enableDamping = true;
-control.autoRotate = true;
 
 
 window.addEventListener('resize', ()=>{
@@ -71,7 +71,27 @@ window.addEventListener('resize', ()=>{
 
 })
 
+//get the clock
+const clock = new THREE.Clock();
+let  previousTime = 0;
+
 const renderLoop =()=>{
+
+  //animation
+  //get the crrent time
+  const currentTime = clock.getElapsedTime();
+
+  //time difference
+  const delta = currentTime - previousTime;
+
+  //assign previous time, the last time (time update)
+  previousTime = currentTime;
+
+ // cubeMesh.scale.x = (Math.sin(currentTime))+1;
+  cubeMesh.position.y = (Math.sin(currentTime))+1
+
+
+
   control.update();
   renderer.render(scene, camera);
   window.requestAnimationFrame(renderLoop)
