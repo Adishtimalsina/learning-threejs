@@ -6,14 +6,30 @@ const scene = new THREE.Scene();
 
 const cube = new THREE.BoxGeometry(1,1,1);
 
-const matrial = new THREE.MeshBasicMaterial({color:"red", wireframe:true})
+//create costume shapes (buffer geometry)
+// const vertices = new Float32Array([0,0,0,0,2,0,2,0,0]);
+
+// const bufferAttribute = new THREE.BufferAttribute(vertices,3);
+
+// const geometry = new THREE.BufferGeometry()
+
+// geometry.setAttribute('position', bufferAttribute);
+
+const matrial = new THREE.MeshBasicMaterial({
+  color:"limegreen",
+  transparent:true,
+  opacity:0.5
+})
 
 const cubeMesh = new THREE.Mesh(cube, matrial)
+const cubeMesh1 = new THREE.Mesh(cube, matrial)
+cubeMesh1.position.x=2
+// cubeMesh.scale.set(2,2,2)
 
-cubeMesh.position.y =1;
+// cubeMesh.position.y =1;
 
 //rotation of the wmesh
-cubeMesh.rotation.x = THREE.MathUtils.degToRad(45);
+// cubeMesh.rotation.x = THREE.MathUtils.degToRad(45);
 
 // //create a parent group, which holds multiple meshes
 // const cubeMesh1 = new THREE.Mesh(cube, matrial)
@@ -29,7 +45,7 @@ cubeMesh.rotation.x = THREE.MathUtils.degToRad(45);
 // //scale the parent, which will scale all the children meshes
 // group.scale.y = 2;
 
-scene.add(cubeMesh);
+scene.add(cubeMesh, cubeMesh1);
 
 
 
@@ -37,7 +53,7 @@ scene.add(cubeMesh);
 const axisesHelper = new THREE.AxesHelper(3);
 
 //adding axises helper to the mesh
-cubeMesh.add(axisesHelper)
+// cubeMesh.add(axisesHelper)
 
 //adding axises helper to the scene
 //scene.add(axisesHelper);
@@ -62,6 +78,7 @@ renderer.setPixelRatio(maxPixelRatio);
 //inistatiate the orbit controll
 const control = new OrbitControls(camera, canvas);
 control.enableDamping = true;
+// control.autoRotate=true;
 
 
 window.addEventListener('resize', ()=>{
@@ -88,7 +105,7 @@ const renderLoop =()=>{
   previousTime = currentTime;
 
  // cubeMesh.scale.x = (Math.sin(currentTime))+1;
-  cubeMesh.position.y = (Math.sin(currentTime))+1
+  // group.position.y = (Math.sin(currentTime))+1
 
 
 
