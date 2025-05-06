@@ -2,17 +2,27 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 
+import { Pane } from 'tweakpane';
+
+// initialize the pane
+const pane = new Pane();
+
 const scene = new THREE.Scene();
 
 //initialize the loader
 const textureLoader = new THREE.TextureLoader();
 
 //change scence background color
- scene.background = new THREE.Color('white');
+// scene.background = new THREE.Color('white');
 
 const cube = new THREE.BoxGeometry(1,1,1);
 const sphere = new THREE.SphereGeometry(.7,50,50)
+
+const uv2Geometry = new THREE.BufferAttribute(sphere.attributes.uv.array, 2)
+sphere.setAttribute('uv2', uv2Geometry) 
+
 const cylinder = new THREE.CylinderGeometry(0.5, 0.5, 1, 32)
+const plane = new THREE.PlaneGeometry();
 
 //create costume shapes (buffer geometry)
 // const vertices = new Float32Array([0,0,0,0,2,0,2,0,0]);
@@ -29,20 +39,59 @@ const cylinder = new THREE.CylinderGeometry(0.5, 0.5, 1, 32)
 // })
 
 const url = "wispy-grass-meadow_albedo.png"
+//const url = 'static/textures/space-cruiser-panels2-bl/space-cruiser-panels2-bl/space-cruiser-panels2_albedo.png'
 
 //initialize the texture
-const textureTest = textureLoader.load(url)
-textureTest.colorSpace = THREE.SRGBColorSpace;
-console.log(textureTest)
+const grassTexture = textureLoader.load(url)
+grassTexture.colorSpace = THREE.SRGBColorSpace;
+// grassTexture.repeat.set(100,100)
+// grassTexture.wrapS = THREE.RepeatWrapping
+// grassTexture.wrapT = THREE.RepeatWrapping
+
+const spaceCruiserAlbedo = textureLoader.load('static/textures/space-cruiser-panels2-bl/space-cruiser-panels2-bl/space-cruiser-panels2_albedo.png')
+grassTexture.colorSpace = THREE.SRGBColorSpace;
+const spaceCruiserAo = textureLoader.load('static/textures/space-cruiser-panels2-bl/space-cruiser-panels2-bl/space-cruiser-panels2_ao.png')
+const spaceCruiserHeight = textureLoader.load('static/textures/space-cruiser-panels2-bl/space-cruiser-panels2-bl/space-cruiser-panels2_height.png')
+const spaceCruiserMetallic = textureLoader.load('static/textures/space-cruiser-panels2-bl/space-cruiser-panels2-bl/space-cruiser-panels2_metallic.png')
+const spaceCruiserNormal = textureLoader.load('static/textures/space-cruiser-panels2-bl/space-cruiser-panels2-bl/space-cruiser-panels2_normal.png')
+const spaceCruiserRoughness = textureLoader.load('static/textures/space-cruiser-panels2-bl/space-cruiser-panels2-bl/space-cruiser-panels2_roughness.png')
 //standart material
-const material = new THREE.MeshBasicMaterial({
-  map:textureTest
-});
+const material = new THREE.MeshStandardMaterial({
+  map:grassTexture,
+  side:THREE.DoubleSide,
+  
+})
+
+const spaceCruiserPane = pane.addFolder({
+  title: 'Space Cruiser Material',
+  expanded: true
+})
+
+
+//material for sphere
+const spaceCruiserMaterial = new THREE.MeshStandardMaterial();
+spaceCruiserMaterial.map = spaceCruiserAlbedo
+spaceCruiserMaterial.roughnessMap = spaceCruiserRoughness
+spaceCruiserMaterial.metalnessMap = spaceCruiserMetallic
+spaceCruiserMaterial.normalMap = spaceCruiserNormal
+spaceCruiserMaterial.displacementMap = spaceCruiserHeight
+spaceCruiserMaterial.displacementScale = 0
+spaceCruiserMaterial.aoMap = spaceCruiserAo
+
+
+
+spaceCruiserPane.addBinding(spaceCruiserMaterial, 'metalness', { min: 0, max: 1, step: 0.01 })
+spaceCruiserPane.addBinding(spaceCruiserMaterial, 'roughness', { min: 0, max: 1, step: 0.01 })
+spaceCruiserPane.addBinding(spaceCruiserMaterial, 'displacementScale', { min: 0, max: 1, step: 0.01 })
+spaceCruiserPane.addBinding(spaceCruiserMaterial, 'aoMapIntensity', { min: 0, max: 1, step: 0.01 })
 
 //material.map = textureTest;
+const planeMesh = new THREE.Mesh(plane, material);
+// planeMesh.rotation.x = -(Math.PI * 0.5);
+// planeMesh.scale.set(1000,1000)
 
 const cylinderMesh = new THREE.Mesh(cylinder, material);
-const sphereMesh = new THREE.Mesh(sphere, material);
+const sphereMesh = new THREE.Mesh(sphere, spaceCruiserMaterial);
 const cubeMesh = new THREE.Mesh(cube, material)
 const cubeMesh1 = new THREE.Mesh(cube, material)
 const torusKnotGeometry = new THREE.TorusKnotGeometry(0.5,0.15,100,16)
@@ -51,6 +100,8 @@ torusKnotMesh.position.x = -2
 cubeMesh1.position.x=2
 sphereMesh.position.y = 2
 cylinderMesh.position.y = -2
+planeMesh.position.y = 2
+planeMesh.position.x = -2
 // cubeMesh.scale.set(2,2,2)
 
 // cubeMesh.position.y =1;
@@ -78,12 +129,14 @@ cylinderMesh.position.y = -2
 
 
 const light = new THREE.AmbientLight(0xffffff, 1)
+scene.add(light)
 
 const pointLight = new THREE.PointLight(0xffffff, 100)
 pointLight.position.set(5,5,5);
+scene.add(pointLight)
 
 
-scene.add(cubeMesh, cubeMesh1, torusKnotMesh, sphereMesh, cylinderMesh, light, pointLight);
+scene.add(planeMesh,cubeMesh, cubeMesh1, sphereMesh, cylinderMesh, torusKnotMesh);
 
 
 
@@ -97,10 +150,11 @@ scene.add(cubeMesh, cubeMesh1, torusKnotMesh, sphereMesh, cylinderMesh, light, p
 //adding axises helper to the scene
 //scene.add(axisesHelper);
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
 
 //position the camera
 camera.position.z = 5;
+
 
 const canvas = document.querySelector('canvas.threejs');
 
@@ -146,12 +200,12 @@ const renderLoop =()=>{
  // cubeMesh.scale.x = (Math.sin(currentTime))+1;
   // group.position.y = (Math.sin(currentTime))+1
 
-    //get each object of the scence (childeren)
-    scene.children.forEach((child)=>{
-      if(child instanceof THREE.Mesh){
-        child.rotation.x +=0.01;
-      }
-    })
+    // get each object of the scence (childeren)
+    // scene.children.forEach((child)=>{
+    //   if(child instanceof THREE.Mesh){
+    //     child.rotation.x +=0.01;
+    //   }
+    // })
   
     
 
