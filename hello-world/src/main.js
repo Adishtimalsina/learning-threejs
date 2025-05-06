@@ -4,6 +4,9 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 
 const scene = new THREE.Scene();
 
+//change scence background color
+ //scene.background = new THREE.Color('white');
+
 const cube = new THREE.BoxGeometry(1,1,1);
 
 //create costume shapes (buffer geometry)
@@ -15,14 +18,16 @@ const cube = new THREE.BoxGeometry(1,1,1);
 
 // geometry.setAttribute('position', bufferAttribute);
 
-const matrial = new THREE.MeshBasicMaterial({
-  color:"limegreen",
+const matrial = new THREE.MeshPhongMaterial({
   transparent:true,
-  opacity:0.5
+  shininess:90
 })
 
 const cubeMesh = new THREE.Mesh(cube, matrial)
 const cubeMesh1 = new THREE.Mesh(cube, matrial)
+const torusKnotGeometry = new THREE.TorusKnotGeometry(0.5,0.15,100,16)
+const torusKnotMesh = new THREE.Mesh(torusKnotGeometry, matrial)
+torusKnotMesh.position.x = -2
 cubeMesh1.position.x=2
 // cubeMesh.scale.set(2,2,2)
 
@@ -39,13 +44,25 @@ cubeMesh1.position.x=2
 // cubeMesh2.position.x= -2;
 
 // //create a group
-// const group = new THREE.Group();
+ const group = new THREE.Group();
 // group.add(cubeMesh, cubeMesh1, cubeMesh2)
 
 // //scale the parent, which will scale all the children meshes
 // group.scale.y = 2;
 
-scene.add(cubeMesh, cubeMesh1);
+//create a fong
+// const fog = new THREE.Fog('white', 1, 10);
+// scene.fog = fog;
+
+
+const light = new THREE.AmbientLight(0xffffff, .5)
+
+const pointLight = new THREE.PointLight('red', 50)
+pointLight.position.set(5,5,5);
+group.add(cubeMesh, cubeMesh1, torusKnotMesh);
+
+scene.add(group, light);
+scene.add(pointLight)
 
 
 
@@ -59,7 +76,6 @@ const axisesHelper = new THREE.AxesHelper(3);
 //scene.add(axisesHelper);
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-const light = new THREE.AmbientLight({color:'white'})
 
 //position the camera
 camera.position.z = 5;
@@ -106,7 +122,6 @@ const renderLoop =()=>{
 
  // cubeMesh.scale.x = (Math.sin(currentTime))+1;
   // group.position.y = (Math.sin(currentTime))+1
-
 
 
   control.update();
