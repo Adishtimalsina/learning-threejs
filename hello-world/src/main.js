@@ -4,10 +4,15 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 
 const scene = new THREE.Scene();
 
+//initialize the loader
+const textureLoader = new THREE.TextureLoader();
+
 //change scence background color
- //scene.background = new THREE.Color('white');
+ scene.background = new THREE.Color('white');
 
 const cube = new THREE.BoxGeometry(1,1,1);
+const sphere = new THREE.SphereGeometry(.7,50,50)
+const cylinder = new THREE.CylinderGeometry(0.5, 0.5, 1, 32)
 
 //create costume shapes (buffer geometry)
 // const vertices = new Float32Array([0,0,0,0,2,0,2,0,0]);
@@ -18,17 +23,34 @@ const cube = new THREE.BoxGeometry(1,1,1);
 
 // geometry.setAttribute('position', bufferAttribute);
 
-const matrial = new THREE.MeshPhongMaterial({
-  transparent:true,
-  shininess:90
-})
+// const matrial = new THREE.MeshPhongMaterial({
+//   transparent:true,
+//   shininess:90
+// })
 
-const cubeMesh = new THREE.Mesh(cube, matrial)
-const cubeMesh1 = new THREE.Mesh(cube, matrial)
+const url = "wispy-grass-meadow_albedo.png"
+
+//initialize the texture
+const textureTest = textureLoader.load(url)
+textureTest.colorSpace = THREE.SRGBColorSpace;
+console.log(textureTest)
+//standart material
+const material = new THREE.MeshBasicMaterial({
+  map:textureTest
+});
+
+//material.map = textureTest;
+
+const cylinderMesh = new THREE.Mesh(cylinder, material);
+const sphereMesh = new THREE.Mesh(sphere, material);
+const cubeMesh = new THREE.Mesh(cube, material)
+const cubeMesh1 = new THREE.Mesh(cube, material)
 const torusKnotGeometry = new THREE.TorusKnotGeometry(0.5,0.15,100,16)
-const torusKnotMesh = new THREE.Mesh(torusKnotGeometry, matrial)
+const torusKnotMesh = new THREE.Mesh(torusKnotGeometry, material)
 torusKnotMesh.position.x = -2
 cubeMesh1.position.x=2
+sphereMesh.position.y = 2
+cylinderMesh.position.y = -2
 // cubeMesh.scale.set(2,2,2)
 
 // cubeMesh.position.y =1;
@@ -55,19 +77,19 @@ cubeMesh1.position.x=2
 // scene.fog = fog;
 
 
-const light = new THREE.AmbientLight(0xffffff, .5)
+const light = new THREE.AmbientLight(0xffffff, 1)
 
-const pointLight = new THREE.PointLight('red', 50)
+const pointLight = new THREE.PointLight(0xffffff, 100)
 pointLight.position.set(5,5,5);
-group.add(cubeMesh, cubeMesh1, torusKnotMesh);
 
-scene.add(group, light);
-scene.add(pointLight)
+
+scene.add(cubeMesh, cubeMesh1, torusKnotMesh, sphereMesh, cylinderMesh, light, pointLight);
+
 
 
 
 //adding axises in the screen
-const axisesHelper = new THREE.AxesHelper(3);
+//const axisesHelper = new THREE.AxesHelper(3);
 
 //adding axises helper to the mesh
 // cubeMesh.add(axisesHelper)
@@ -108,6 +130,7 @@ window.addEventListener('resize', ()=>{
 const clock = new THREE.Clock();
 let  previousTime = 0;
 
+
 const renderLoop =()=>{
 
   //animation
@@ -123,6 +146,14 @@ const renderLoop =()=>{
  // cubeMesh.scale.x = (Math.sin(currentTime))+1;
   // group.position.y = (Math.sin(currentTime))+1
 
+    //get each object of the scence (childeren)
+    scene.children.forEach((child)=>{
+      if(child instanceof THREE.Mesh){
+        child.rotation.x +=0.01;
+      }
+    })
+  
+    
 
   control.update();
   renderer.render(scene, camera);
