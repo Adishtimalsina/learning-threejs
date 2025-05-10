@@ -15,6 +15,8 @@ const textureLoader = new THREE.TextureLoader();
 //change scence background color
 // scene.background = new THREE.Color('white');
 
+//this is new comment
+
 const cube = new THREE.BoxGeometry(1,1,1);
 const sphere = new THREE.SphereGeometry(.7,50,50)
 
